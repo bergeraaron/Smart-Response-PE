@@ -34,7 +34,7 @@ BUILD_LIB = sdar -rc
 LINK = sdcc -mmcs51 --xram-loc $(XRAM_LOC) --xram-size $(XRAM_SIZE)
 
 # symbolic targets:
-all: rom.bin
+all: talk-back.bin talk-back.hex
 
 print-%: ; @echo $* = $($*)
 
@@ -49,13 +49,20 @@ $(BUILD_DIR)/lib/%.rel: $(ROOT_DIR)/lib/%.c
 $(BUILD_DIR)/lib.lib: $(LIB_OBJECTS)
 	$(BUILD_LIB) $@ $(LIB_OBJECTS)
 
-$(BUILD_DIR)/rom.ihx: $(OBJECTS) $(BUILD_DIR)/lib.lib
+$(BUILD_DIR)/talk-back.ihx: $(OBJECTS) $(BUILD_DIR)/lib.lib
 	@mkdir -p $(dir $(BUILD_DIR))
-	$(LINK) --out-fmt-ihx -o $(BUILD_DIR)/rom.ihx $(OBJECTS) $(BUILD_DIR)/lib.lib
+	$(LINK) --out-fmt-ihx -o $(BUILD_DIR)/talk-back.ihx $(OBJECTS) $(BUILD_DIR)/lib.lib
 
-rom.bin: $(BUILD_DIR)/rom.ihx
-	makebin $(BUILD_DIR)/rom.ihx > rom.bin
+talk-back.bin: $(BUILD_DIR)/talk-back.ihx
+	makebin $(BUILD_DIR)/talk-back.ihx > talk-back.bin
+
+talk-back.hex: $(BUILD_DIR)/talk-back.ihx
+	cp $(BUILD_DIR)/talk-back.ihx ./talk-back.hex
+
+program: talk-back.hex
+	cc-tool -t 
 
 clean:
 	rm -r -f $(BUILD_DIR)
+	rm talk-back.hex
 
